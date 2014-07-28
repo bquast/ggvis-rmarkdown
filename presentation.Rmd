@@ -1,0 +1,42 @@
+---
+title: "Cocaine"
+author: "Bastiaan Quast"
+date: "Monday, July 28, 2014"
+output: ioslides_presentation
+runtime: shiny
+---
+
+## Slideshow
+
+In this HTML5 slideshow we develop a dynamic plot of the **cocaine** dataset using the **ggvis** package.
+
+## Setting the stage
+
+```{r}
+# load the package
+library(ggvis)
+
+# load, inspect, and subset the data
+data(cocaine)
+str(cocaine)
+cocaine <- subset(cocaine,
+                  table(state)[state] >= 200 & price < 500)
+```
+
+# how do we explain the estimated price?
+
+## Dynamic plot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cocaine %>%
+  ggvis(~weight, ~price) %>%
+  layer_smooths(span = input_slider(0.5, 1, label='span'),
+                se = TRUE) %>%
+  group_by(state) %>%
+  layer_points(size := input_slider(10, 200, 50,
+                                    label='size'),
+               opacity := input_slider(0.1, 1, 0.3,
+                                       label = 'opacity'),
+               fill = ~state) %>%
+  layer_smooths(se = TRUE, fill = ~state)
+```
